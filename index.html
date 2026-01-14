@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今天吃什么？Vibe Coding 4.0</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --danger: #ff6b6b;
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --text: #333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 { margin-top:0; margin-bottom: 20px; font-size: 1.6rem; text-align: center; color: #2c3e50; }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+
+        .section-title {
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            color: #555;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .section-subtitle {
+            font-size: 0.75rem;
+            font-weight: normal;
+            color: #999;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            background: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        label:hover { border-color: var(--primary); }
+
+        /* 隐藏原生 checkbox */
+        input[type="checkbox"] { display: none; }
+
+        /* === 蓝色系：想吃 (Positive) === */
+        .positive-group label:hover { border-color: var(--primary); }
+        .positive-group input:checked + span { color: var(--primary); font-weight: bold; }
+        .positive-group label:has(input:checked) { border-color: var(--primary); background: #eef6ff; }
+
+        /* === 红色系：不吃 (Negative) === */
+        .negative-group label:hover { border-color: var(--danger); }
+        .negative-group input:checked + span { color: var(--danger); text-decoration: line-through; font-weight: bold; }
+        .negative-group label:has(input:checked) { border-color: var(--danger); background: #fff0f0; }
+
+        .result-box {
+            margin: 20px 0;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border: 2px dashed #ddd;
+            border-radius: 15px;
+            text-align: center;
+            padding: 15px;
+            position: relative;
+        }
+
+        .food-name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2c3e50;
+            margin: 5px 0;
+            line-height: 1.2;
+        }
+
+        .food-tags {
+            margin-top: 10px;
+            font-size: 0.75rem;
+        }
+        
+        .tag-pill {
+            display: inline-block;
+            background: #eee;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            color: #666;
+        }
+
+        .tag-pill.highlight { background: #eef6ff; color: var(--primary); border: 1px solid #b3d7ff; }
+        .tag-pill.warn { background: #ffebeb; color: #d63031; }
+
+        button.action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+            transition: transform 0.1s;
+        }
+
+        button.action-btn:active { transform: scale(0.98); }
+        
+        .count-hint { font-size: 0.8rem; color: #aaa; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🍱 今天吃什么 v4.0</h1>
+
+    <div class="section positive-group">
+        <span class="section-title">
+            😋 今天想吃点... 
+            <span class="section-subtitle">可多选，不选默认全部</span>
+        </span>
+        <div class="tags-container">
+            <label><input type="checkbox" value="米饭"> <span>米饭/饭类</span></label>
+            <label><input type="checkbox" value="面食"> <span>面/粉</span></label>
+            <label><input type="checkbox" value="日式"> <span>日式</span></label>
+            <label><input type="checkbox" value="韩式"> <span>韩式</span></label>
+            <label><input type="checkbox" value="汤"> <span>带汤的</span></label>
+            <label><input type="checkbox" value="肉"> <span>大口吃肉</span></label>
+            <label><input type="checkbox" value="轻食"> <span>减脂/轻食</span></label>
+            <label><input type="checkbox" value="辣"> <span>来点辣的</span></label>
+        </div>
+    </div>
+
+    <div class="section negative-group">
+        <span class="section-title">
+            🚫 绝对不吃/忌口
+            <span class="section-subtitle">一票否决</span>
+        </span>
+        <div class="tags-container">
+            <label><input type="checkbox" value="辣"> <span>辣</span></label>
+            <label><input type="checkbox" value="姜"> <span>姜</span></label>
+            <label><input type="checkbox" value="蒜"> <span>蒜</span></label>
+            <label><input type="checkbox" value="葱"> <span>葱</span></label>
+            <label><input type="checkbox" value="香菜"> <span>香菜</span></label>
+            <label><input type="checkbox" value="折耳根"> <span>折耳根</span></label>
+            <label><input type="checkbox" value="内脏"> <span>内脏</span></label>
+            <label><input type="checkbox" value="海鲜"> <span>海鲜/鱼</span></label>
+            <label><input type="checkbox" value="鸡蛋"> <span>鸡蛋</span></label>
+            <label><input type="checkbox" value="麸质"> <span>麸质(面/包)</span></label>
+            <label><input type="checkbox" value="白人饭"> <span>白人饭</span></label>
+            <label><input type="checkbox" value="生食"> <span>生食</span></label>
+        </div>
+    </div>
+
+    <div class="result-box">
+        <div id="resultName" class="food-name" style="font-size:1.5rem; color:#ccc;">等待...</div>
+        <div id="resultTags" class="food-tags"></div>
+    </div>
+
+    <button class="action-btn" onclick="rollFood()">🎲 开始随机</button>
+    <div class="count-hint" id="countHint"></div>
+</div>
+
+<script>
+    // === 数据库区域 ===
+    const menu = [
+        // --- 日式 ---
+        { name: "招牌牛丼饭", tags: ["日式", "米饭", "牛羊肉", "洋葱", "肉"] },
+        { name: "日式咖喱猪排饭", tags: ["日式", "米饭", "猪肉", "炸", "肉", "麸质"] },
+        { name: "温泉蛋葱花牛丼", tags: ["日式", "米饭", "牛羊肉", "鸡蛋", "葱", "肉"] },
+        { name: "鳗鱼饭", tags: ["日式", "米饭", "海鲜", "甜口", "肉"] },
+        { name: "照烧鸡排饭", tags: ["日式", "米饭", "鸡肉", "甜口", "肉"] },
+        { name: "三文鱼刺身/寿司", tags: ["日式", "米饭", "海鲜", "生食", "冷食", "轻食"] },
+        { name: "加州卷", tags: ["日式", "米饭", "海鲜", "冷食", "沙拉酱", "黄瓜"] },
+        { name: "豚骨拉面", tags: ["日式", "面食", "猪肉", "汤", "葱", "麸质", "肉"] },
+        { name: "日式寿喜锅", tags: ["日式", "汤", "牛羊肉", "豆腐", "大白菜", "肉"] },
+
+        // --- 韩式 ---
+        { name: "石锅拌饭", tags: ["韩式", "米饭", "鸡蛋", "辣", "胡萝卜", "豆芽"] },
+        { name: "韩式泡菜汤", tags: ["韩式", "汤", "辣", "猪肉", "豆腐", "酸"] },
+        { name: "韩式大酱汤", tags: ["韩式", "汤", "豆腐", "海鲜", "葱", "蒜"] },
+        { name: "辣白菜五花肉炒饭", tags: ["韩式", "米饭", "猪肉", "辣", "蒜", "肉"] },
+        { name: "韩式冷面", tags: ["韩式", "面食", "辣", "鸡蛋", "冷食", "麸质"] },
+        { name: "韩式牛肉汤饭", tags: ["韩式", "汤", "米饭", "牛羊肉", "清淡", "葱", "肉"] },
+
+        // --- 中式简餐 ---
+        { name: "番茄炒蛋盖饭", tags: ["鸡蛋", "米饭", "家常菜", "清淡"] },
+        { name: "青椒肉丝盖饭", tags: ["猪肉", "米饭", "辣", "家常菜", "肉"] },
+        { name: "鱼香肉丝", tags: ["猪肉", "米饭", "辣", "笋", "木耳", "蒜", "肉"] },
+        { name: "宫保鸡丁", tags: ["鸡肉", "米饭", "辣", "花生", "葱", "肉"] },
+        { name: "土豆牛腩", tags: ["牛羊肉", "米饭", "家常菜", "肉"] },
+        { name: "红烧排骨饭", tags: ["猪肉", "米饭", "家常菜", "甜口", "肉"] },
+        
+        // --- 面食/粉 ---
+        { name: "兰州拉面", tags: ["牛羊肉", "面食", "香菜", "清淡", "葱", "汤", "麸质", "肉"] },
+        { name: "重庆小面", tags: ["面食", "辣", "重口味", "花椒", "葱", "碳水炸弹", "麸质"] },
+        { name: "红烧牛肉面", tags: ["牛羊肉", "面食", "辣", "香菜", "汤", "麸质", "肉"] },
+        
+        // --- 特色 ---
+        { name: "酸菜鱼", tags: ["海鲜", "鱼", "米饭", "辣", "姜", "花椒", "重口味", "汤", "肉"] },
+        { name: "毛血旺", tags: ["内脏", "鸭血", "辣", "重口味", "午餐肉", "肉"] },
+        { name: "猪肚鸡", tags: ["鸡肉", "内脏", "清淡", "汤", "胡椒", "肉"] },
+        
+        // --- 粤式 ---
+        { name: "干炒牛河", tags: ["牛羊肉", "面食", "葱", "芽菜", "肉"] },
+        { name: "鲜虾云吞面", tags: ["海鲜", "面食", "清淡", "汤", "麸质", "肉"] },
+        { name: "皮蛋瘦肉粥", tags: ["猪肉", "米饭", "清淡", "姜", "葱", "汤"] },
+
+        // --- 西式/快餐 ---
+        { name: "麦当劳双层吉士堡", tags: ["牛羊肉", "快餐", "热量炸弹", "麸质", "肉"] },
+        { name: "肯德基香辣鸡腿堡", tags: ["鸡肉", "快餐", "辣", "炸", "麸质", "肉"] },
+        { name: "赛百味火鸡胸三明治", tags: ["白人饭", "冷食", "鸡肉", "面包", "麸质", "轻食"] },
+        { name: "轻食波奇饭", tags: ["白人饭", "海鲜", "冷食", "米饭", "生食", "轻食"] },
+        { name: "鸡胸肉凯撒沙拉", tags: ["白人饭", "草", "冷食", "鸡肉", "轻食"] },
+    ];
+
+    let lastDishName = "";
+
+    function rollFood() {
+        const resultName = document.getElementById('resultName');
+        const resultTags = document.getElementById('resultTags');
+        const countHint = document.getElementById('countHint');
+
+        // 1. 获取正向条件 (Array)
+        const cravingCheckboxes = document.querySelectorAll('.positive-group input:checked');
+        const cravings = Array.from(cravingCheckboxes).map(cb => cb.value);
+
+        // 2. 获取负向条件 (Array)
+        const bannedCheckboxes = document.querySelectorAll('.negative-group input:checked');
+        const bannedTags = Array.from(bannedCheckboxes).map(cb => cb.value);
+
+        // 3. 过滤逻辑
+        const safeList = menu.filter(dish => {
+            const dishTags = dish.tags;
+            
+            // A. 忌口检查 (一票否决)
+            const hasBanned = dishTags.some(tag => bannedTags.includes(tag));
+            if (hasBanned) return false;
+            // 关联忌口：不吃麸质 -> 也就不能吃面食
+            if (bannedTags.includes("麸质") && dishTags.includes("面食")) return false;
+
+            // B. 想吃检查 (OR 逻辑)
+            // 如果用户什么都没选 (length === 0)，则默认所有菜都符合正向条件
+            if (cravings.length === 0) return true;
+
+            // 如果用户选了，只要菜品包含"任意一个"想要的标签，就保留
+            // 比如选了 ["韩式", "肉"]，那么"韩式素菜"或"中式红烧肉"都算过
+            const matchCraving = dishTags.some(tag => cravings.includes(tag));
+            return matchCraving;
+        });
+
+        // 4. 更新UI与抽取
+        countHint.innerText = `当前符合条件的有 ${safeList.length} 道菜`;
+
+        if (safeList.length === 0) {
+            resultName.style.color = "#aaa";
+            resultName.innerText = "没想出来...";
+            
+            // 智能提示
+            if (cravings.includes("辣") && bannedTags.includes("辣")) {
+                resultTags.innerHTML = "既想吃辣又不想吃辣？";
+            } else {
+                resultTags.innerHTML = "筛选太严啦，放宽点条件吧";
+            }
+            return;
+        }
+
+        // 去重抽取
+        let finalDish;
+        if (safeList.length === 1) {
+            finalDish = safeList[0];
+        } else {
+            let attempts = 0;
+            do {
+                const randomIndex = Math.floor(Math.random() * safeList.length);
+                finalDish = safeList[randomIndex];
+                attempts++;
+            } while (finalDish.name === lastDishName && attempts < 10);
+        }
+        lastDishName = finalDish.name;
+
+        // 5. 动画展示
+        let count = 0;
+        const interval = setInterval(() => {
+            const tempIndex = Math.floor(Math.random() * safeList.length);
+            resultName.style.color = "#999";
+            resultName.innerText = safeList[tempIndex].name;
+            count++;
+            
+            if (count >= 10) {
+                clearInterval(interval);
+                resultName.style.color = "#2c3e50";
+                resultName.innerText = finalDish.name;
+                
+                // 渲染标签
+                const tagsHtml = finalDish.tags.map(t => {
+                    let className = 'tag-pill';
+                    // 如果这个tag是你刚才点的“想吃”的，高亮显示
+                    if (cravings.includes(t)) className += ' highlight';
+                    // 如果是风险过敏原，标红
+                    if (["辣", "麸质", "鸡蛋", "生食", "内脏"].includes(t)) className += ' warn';
+                    return `<span class="${className}">${t}</span>`;
+                }).join('');
+                resultTags.innerHTML = tagsHtml;
+            }
+        }, 50);
+    }
+</script>
+
+</body>
+</html>
